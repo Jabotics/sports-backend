@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .customer_table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            border: 2px solid brown;
+            background-color: white;
+        }
+
+        .customer_table th,
+        .customer_table td {
+            border: 1px solid brown;
+            padding: 10px;
+            text-align: left;
+            color: black;
+        }
+
+        .customer_table th {
+            background-color: #ffcc66;
+            /* Header background color */
+        }
+
+        .customer_table tr:nth-child(even) {
+            background-color: #f9f9f9;
+            /* Alternate row color */
+        }
+
+        .customer_table tr:hover {
+            background-color: #e0e0e0;
+            /* Hover color */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Venue Expense Report</h1>
+    <table class="customer_table">
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+        </tr>
+        {{#if report_data.expenses.length}}
+        <div style="margin-left: 20px;">
+            <h2>{{report_data.month}}-{{report_data.year}}</h2>
+        </div>
+        {{#each report_data.expenses}}
+        <tr>
+            <td>{{this.desc}}</td>
+            <td>₹{{this.amount}}</td>
+        </tr>
+        {{/each}}
+        <tr>
+            <td style="font-weight: bold; font-size: 18px;">Total</td>
+            <td style="font-weight: bold; font-size: 18px;">₹{{report_data.total}}
+            </td>
+        </tr>
+        {{/if}}
+    </table>
+</body>
+
+</html>

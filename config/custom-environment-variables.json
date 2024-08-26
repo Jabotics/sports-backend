@@ -1,0 +1,9 @@
+{
+    "port": "d3_port",
+    "db_username": "d3_db_username",
+    "db_password": "d3_db_password",
+    "jwt_secretkey": "d3_jwt_secretkey",
+    "email_id": "d3_email_id",
+    "email_pass": "d3_email_pass",
+    "frontend_url": "d3_frontend_url"
+}

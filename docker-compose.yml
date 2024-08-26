@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  d3-backend:
+    build: .
+    init: true
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: "d3-backend"

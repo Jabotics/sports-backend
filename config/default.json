@@ -1,0 +1,9 @@
+{
+    "port": "",
+    "db_username": "",
+    "db_password": "",
+    "jwt_secretkey": "",
+    "email_id": "",
+    "email_pass": "",
+    "frontend_url": ""
+}
