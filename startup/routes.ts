@@ -36,7 +36,8 @@ import {
     faqRoutes,
     blogRoutes,
     feedbackRoutes,
-    happyCustomerRoutes,    
+    happyCustomerRoutes,
+    partnerRequestRoutes,
 } from "../routes";
 
 const multipartDataHandler = multer().any();
@@ -58,37 +59,11 @@ export default async function (app: Express) {
     await connectDB();
 
     //API Routes
-    app.use('/api', faqRoutes);
-    app.use('/api', empRoutes);
-    app.use('/api', cityRoutes);
-    app.use('/api', menuRoutes);
-    app.use('/api', blogRoutes);
-    app.use('/api', chatRoutes);
-    app.use('/api', roleRoutes);
-    app.use('/api', authRoutes);
-    app.use('/api', adminRoutes);
-    app.use('/api', sportRoutes);
-    app.use('/api', venueRoutes);
-    app.use('/api', eventRoutes);
-    app.use('/api', memberRoutes);
-    app.use('/api', bannerRoutes);
-    app.use('/api', groundRoutes);
-    app.use('/api', paymentRoutes);
-    app.use('/api', settingRoutes);
-    app.use('/api', inquiryRoutes);    
-    app.use('/api', academyRoutes);
-    app.use('/api', slotTimeRoutes);
-    app.use('/api', customerRoutes);
-    app.use('/api', feedbackRoutes);
-    app.use('/api', promoCodeRoutes);
-    app.use('/api', dashboardRoutes);
-    app.use('/api', membershipRoutes);
-    app.use('/api', slotBookingRoutes);
-    app.use('/api', reserveSlotRoutes);
-    app.use('/api', venueExpenseRoutes);
-    app.use('/api', eventRequestRoutes);
-    app.use('/api', happyCustomerRoutes);
-    app.use('/api', academyStudentRoutes);
+    let routes = [faqRoutes, empRoutes, cityRoutes, menuRoutes, blogRoutes, chatRoutes, roleRoutes, authRoutes, adminRoutes, sportRoutes, venueRoutes, eventRoutes, memberRoutes, bannerRoutes, groundRoutes, paymentRoutes, settingRoutes, inquiryRoutes, academyRoutes, slotTimeRoutes, customerRoutes, feedbackRoutes, promoCodeRoutes, dashboardRoutes, membershipRoutes, slotBookingRoutes, reserveSlotRoutes, venueExpenseRoutes, eventRequestRoutes, happyCustomerRoutes, academyStudentRoutes, partnerRequestRoutes];
+
+    for (let i in routes) {
+        app.use('/api', routes[i]);
+    }
 
     //Lost routes
     app.use((req: Request, res: Response) => {

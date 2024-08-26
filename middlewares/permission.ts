@@ -33,6 +33,7 @@ const menus = {
     EVENT_REQUEST: 'EVENT_REQUEST',
     Slot_Bookings: 'SLOT_BOOKINGS',
     Happy_Customers: 'HAPPY_CUSTOMERS',
+    Partner_Request: 'PARTNER_REQUEST'
 }
 
 const add = (menu_name: string) => {

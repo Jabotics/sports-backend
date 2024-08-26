@@ -516,6 +516,18 @@ interface IHappyCustomer extends Document {
     soft_delete: boolean;
 }
 
+interface IPartnerRequest extends Document {
+    first_name: string;
+    last_name: string;
+    email: string;
+    mobile: string;
+    venue_name: string;
+    address: string;
+    city: Types.ObjectId;
+    approved: boolean;
+    soft_delete: boolean;
+}
+
 export {
     IMenu,
     ICity,
@@ -555,6 +567,7 @@ export {
     IHappyCustomer,
     IMembershipFee,
     IHomepageBanner,
+    IPartnerRequest,
     VerificationType,
     IAcademyStudents,
     IReservationSlot,

@@ -22,7 +22,7 @@ const io = new Server(server, {
     },
     transports: ['websocket', 'polling']
 })
-const PORT = config.get('port') || 5050;
+const PORT = config.get('port') || 5000;
 
 // (async function () {
 //     await clearData('chat');    

@@ -45,6 +45,7 @@ import {
     IFeedback,
     FeedbackTopic,
     IHappyCustomer,
+    IPartnerRequest,
 } from "../types/types";
 import {
     roleDeleteMiddleware,
@@ -1509,6 +1510,46 @@ const happyCustomerSchema = new Schema<IHappyCustomer>({
     }
 }, {timestamps: true});
 
+const partnerRequestSchema = new Schema<IPartnerRequest>({
+    city: {
+        type: Schema.Types.ObjectId,
+        ref: 'City',
+        required: true
+    },
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    mobile: {
+        type: String,
+        required: true
+    },
+    venue_name: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
+    },
+    approved: {
+        type: Boolean,
+        default: false
+    },
+    soft_delete: {
+        type: Boolean,
+        default: false
+    }
+});
+
 //Middlewares
 citySchema.pre('updateMany', { query: true, document: false }, cityDeleteMiddleware);
 roleSchema.pre('updateMany', { query: true, document: false }, roleDeleteMiddleware);
@@ -1554,6 +1595,7 @@ const HappyCustomer = model<IHappyCustomer>("HappyCustomer", happyCustomerSchema
 const MembershipFee = model<IMembershipFee>("MembershipFee", membershipFeeSchema);
 const ReservationSlot = model<IReservationSlot>("ReservationSlot", reservationSlot);
 const HomepageBanner = model<IHomepageBanner>("HomepageBanner", homepageBannerSchema);
+const PartnerRequest = model<IPartnerRequest>("PartnerRequest", partnerRequestSchema);
 const BlacklistedToken = model<IBlacklistedToken>("BlacklistedToken", blacklistedTokenSchema);
 
 export {
@@ -1587,6 +1629,7 @@ export {
     MembershipFee,
     HappyCustomer,
     HomepageBanner,
+    PartnerRequest,
     ReservationSlot,
     BlacklistedToken,
 }

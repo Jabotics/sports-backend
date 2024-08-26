@@ -21,6 +21,7 @@ export { default as slotTimeRoutes } from './slotTimes';
 export { default as promoCodeRoutes } from './promoCode';
 export { default as membershipRoutes } from './membership';
 export { default as bannerRoutes } from './homepageBanner';
+export { default as partnerRequestRoutes } from './partner';
 export { default as paymentRoutes } from './fee_and_payment';
 export { default as reserveSlotRoutes } from './reserveSlot';
 export { default as slotBookingRoutes } from './slotBooking';

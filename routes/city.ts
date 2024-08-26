@@ -19,7 +19,7 @@ interface CityQuery extends FilterQuery<ICity> {
 
 const router = Router();
 
-router.post('/add-city', [verifyJWT, add(menus.Cities)], add(menus.Cities), asyncHandler(async (req: CustomRequest, res: Response) => {
+router.post('/add-city', [verifyJWT, add(menus.Cities), add(menus.Cities)], asyncHandler(async (req: CustomRequest, res: Response) => {
     const cityName = req.body.name;
     const user = req.user;
 
