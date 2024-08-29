@@ -47,6 +47,7 @@ import {
     IHappyCustomer,
     IPartnerRequest,
     PartnerRequestStatus,
+    IGroundReview,
 } from "../types/types";
 import {
     roleDeleteMiddleware,
@@ -1552,6 +1553,35 @@ const partnerRequestSchema = new Schema<IPartnerRequest>({
     }
 });
 
+const groundReviewSchema = new Schema<IGroundReview>({
+    customer: {
+        type: Schema.Types.ObjectId,
+        ref: 'Customer',
+        required: true
+    },
+    ground: {
+        type: Schema.Types.ObjectId,
+        ref: 'Ground',
+        required: true
+    },
+    review: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true
+    },
+    is_active: {
+        type: Boolean,
+        default: true
+    },
+    soft_delete: {
+        type: Boolean,
+        default: false
+    }
+});
+
 //Middlewares
 citySchema.pre('updateMany', { query: true, document: false }, cityDeleteMiddleware);
 roleSchema.pre('updateMany', { query: true, document: false }, roleDeleteMiddleware);
@@ -1591,6 +1621,7 @@ const AcademyFee = model<IAcademyFee>("AcademyFee", academyFeeSchema);
 const Reservation = model<IReservation>("Reservation", reservationSchema);
 const SlotBooking = model<ISlotBooking>("SlotBooking", slotBookingSchema);
 const EventRequest = model<IEventRequest>("EventRequest", eventRequestSchema);
+const GroundReview = model<IGroundReview>("GroundReview", groundReviewSchema);
 const Verification = model<IVerification>("Verification", verificationSchema);
 const VenueExpense = model<IVenueExpenses>("VenueExpense", venueExpensesSchema);
 const HappyCustomer = model<IHappyCustomer>("HappyCustomer", happyCustomerSchema);
@@ -1628,6 +1659,7 @@ export {
     Verification,
     EventRequest,
     VenueExpense,
+    GroundReview,
     MembershipFee,
     HappyCustomer,
     HomepageBanner,

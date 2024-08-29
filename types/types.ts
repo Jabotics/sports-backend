@@ -534,6 +534,15 @@ interface IPartnerRequest extends Document {
     soft_delete: boolean;
 }
 
+interface IGroundReview extends Document {
+    customer: Types.ObjectId;
+    ground: Types.ObjectId;
+    review: string;
+    rating: number;
+    is_active: boolean;
+    soft_delete: boolean;
+}
+
 export {
     IMenu,
     ICity,
@@ -566,6 +575,7 @@ export {
     PaymentMode,
     IReservation,
     ISlotBooking,
+    IGroundReview,
     IEventRequest,
     FeedbackTopic,
     IVerification,
