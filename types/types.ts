@@ -72,6 +72,12 @@ enum FeedbackTopic {
     OTHER = 'Other'
 }
 
+enum PartnerRequestStatus {
+    PENDING='Pending',
+    ACCEPTED='Accepted',
+    REJECTED='Rejected'
+}
+
 
 //Interfaces
 interface IAdmin extends Document {
@@ -84,7 +90,7 @@ interface IAdmin extends Document {
     last_name?: string;
     is_active: boolean;
     first_name?: string;
-    is_subadmin: boolean;
+    partner: boolean;
     soft_delete: boolean;
     city?: Types.ObjectId;
     profile_image?: string;
@@ -523,8 +529,8 @@ interface IPartnerRequest extends Document {
     mobile: string;
     venue_name: string;
     address: string;
-    city: Types.ObjectId;
-    approved: boolean;
+    request_status: PartnerRequestStatus;
+    city: Types.ObjectId;    
     soft_delete: boolean;
 }
 
@@ -574,6 +580,7 @@ export {
     SubscriptionType,
     IBlacklistedToken,
     SlotBookingStatus,
+    PartnerRequestStatus,
     PromoCodeApplicableFor,
     EventRegistrationStatus,    
 }

@@ -21,7 +21,7 @@ import {
     VerificationType,
     SlotBookingStatus,
     IBlacklistedToken,
-    EventRegistrationStatus,    
+    EventRegistrationStatus,
     IVenueExpenses,
     GroundType,
     IAcademyStudents,
@@ -31,7 +31,7 @@ import {
     IMembers,
     IMembershipFee,
     PaymentMode,
-    PromoCodeApplicableFor,    
+    PromoCodeApplicableFor,
     IReservation,
     IReservationSlot,
     IMembership,
@@ -46,6 +46,7 @@ import {
     FeedbackTopic,
     IHappyCustomer,
     IPartnerRequest,
+    PartnerRequestStatus,
 } from "../types/types";
 import {
     roleDeleteMiddleware,
@@ -101,7 +102,7 @@ const adminSchema = new Schema<IAdmin>({
         type: Boolean,
         default: false
     },
-    is_subadmin: {
+    partner: {
         type: Boolean,
         default: false
     },
@@ -622,7 +623,7 @@ const academySchema = new Schema<IAcademy>({
         required: false
     },
     max_buffer_days: {
-        type: Number,        
+        type: Number,
         default: 0
     },
     is_active: {
@@ -989,7 +990,7 @@ const studentsSchema = new Schema<IAcademyStudents>({
         type: Schema.Types.ObjectId,
         ref: 'Academy',
         required: true
-    },    
+    },
     payment_date: {
         type: Date,
         required: true
@@ -1111,7 +1112,7 @@ const academyFeeSchema = new Schema<IAcademyFee>({
     },
     admission_fee: {
         type: Number,
-        default: 0,        
+        default: 0,
     },
     payment_mode: {
         type: String,
@@ -1208,10 +1209,10 @@ const membershipFeeSchema = new Schema<IMembershipFee>({
     },
     joining_fee: {
         type: Number,
-        default: 0,        
+        default: 0,
     },
     other_charges: {
-        type: Number, 
+        type: Number,
         default: 0
     },
     payment_mode: {
@@ -1229,7 +1230,7 @@ const reservationSchema = new Schema<IReservation>({
         required: true
     },
     city: {
-        type: String,        
+        type: String,
         required: true
     },
     venue: {
@@ -1269,7 +1270,7 @@ const reservationSchema = new Schema<IReservation>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Reservation Slot Schema
 const reservationSlot = new Schema<IReservationSlot>({
@@ -1295,7 +1296,7 @@ const reservationSlot = new Schema<IReservationSlot>({
         enum: SlotBookingStatus,
         default: SlotBookingStatus.BOOKED
     },
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Message Schema
 const messageSchema = new Schema<IMessage>({
@@ -1306,12 +1307,12 @@ const messageSchema = new Schema<IMessage>({
     text: {
         type: String,
         required: true
-    },    
+    },
     seen: {
         type: Boolean,
         default: false
     }
-}, {timestamps: true})
+}, { timestamps: true })
 
 //Chat Schema
 const chatSchema = new Schema<IChat>({
@@ -1319,14 +1320,14 @@ const chatSchema = new Schema<IChat>({
         type: Schema.Types.ObjectId,
         ref: 'Customer',
         required: true
-    },    
+    },
     super_admin: {
         type: Schema.Types.ObjectId,
         ref: 'Admin',
         required: true
     },
     employee: [{
-        type: Schema.Types.ObjectId,        
+        type: Schema.Types.ObjectId,
         ref: 'Employee',
         required: false
     }],
@@ -1339,7 +1340,7 @@ const chatSchema = new Schema<IChat>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Homepage Banner Schema
 const homepageBannerSchema = new Schema<IHomepageBanner>({
@@ -1363,7 +1364,7 @@ const homepageBannerSchema = new Schema<IHomepageBanner>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Event Request Schema
 const eventRequestSchema = new Schema<IEventRequest>({
@@ -1388,7 +1389,7 @@ const eventRequestSchema = new Schema<IEventRequest>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //FAQ Schema
 const faqSchema = new Schema<IFAQs>({
@@ -1405,15 +1406,15 @@ const faqSchema = new Schema<IFAQs>({
         type: String,
         required: true
     },
-    is_active:{
+    is_active: {
         type: Boolean,
         default: true
     },
-    soft_delete:{
+    soft_delete: {
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Blog Schema
 const blogSchema = new Schema<IBlog>({
@@ -1459,7 +1460,7 @@ const blogSchema = new Schema<IBlog>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Customer Feedback Schema
 const feedbackSchema = new Schema<IFeedback>({
@@ -1488,7 +1489,7 @@ const feedbackSchema = new Schema<IFeedback>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //Happy Customers Schema
 const happyCustomerSchema = new Schema<IHappyCustomer>({
@@ -1508,7 +1509,7 @@ const happyCustomerSchema = new Schema<IHappyCustomer>({
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 const partnerRequestSchema = new Schema<IPartnerRequest>({
     city: {
@@ -1540,9 +1541,10 @@ const partnerRequestSchema = new Schema<IPartnerRequest>({
         type: String,
         required: true
     },
-    approved: {
-        type: Boolean,
-        default: false
+    request_status: {
+        type: String,
+        enum: PartnerRequestStatus,
+        default: PartnerRequestStatus.PENDING
     },
     soft_delete: {
         type: Boolean,
@@ -1561,7 +1563,7 @@ slotTimeSchema.pre('updateMany', { query: true, document: false }, slotTimeDelet
 blacklistedTokenSchema.index({ createdAt: 1 }, { expireAfterSeconds: 604800 });
 
 //Indexing
-customerSchema.index({mobile: 'text'});
+customerSchema.index({ mobile: 'text' });
 
 //Schema Models
 const FAQ = model<IFAQs>("FAQ", faqSchema);
@@ -1612,7 +1614,7 @@ export {
     Member,
     Ground, groundSchema,
     Inquiry,
-    Academy,    
+    Academy,
     Student,
     Employee,
     SlotTime,

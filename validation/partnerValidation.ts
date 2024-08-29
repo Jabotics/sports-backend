@@ -19,11 +19,19 @@ const get_partner_request = Joi.object({
 
 const update_partner_request = Joi.object({
     id: Joi.string().required(),
-    approved: Joi.boolean().required()
+    status: Joi.string().valid('Accepted', 'Rejected').required(),
+    first_name: Joi.string().min(2).max(30),
+    last_name: Joi.string().min(2).max(30),
+    email: Joi.string().email(),
+    mobile: Joi.string().pattern(new RegExp('[0-9]{7,10}')),
+    password: Joi.string().min(8).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};:\'"|,.<>\\/?]{3,30}$')).messages({
+        'string.min': 'Password must be at least 8 characters long',
+        'string.pattern.base': 'Password must contain only letters, numbers, and special characters'
+    }),
 });
 
 export {
-    get_partner_request,
+    get_partner_request,    
     update_partner_request,
     become_partner_validation,
 }

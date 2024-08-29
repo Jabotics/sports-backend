@@ -20,8 +20,8 @@ interface MenuQuery extends FilterQuery<IMenu> {
 
 const router = Router();
 
-router.post('/add-menu', [verifyJWT, add(menus.Menus)], asyncHandler(async (req: Request, res: Response) => {
-    const menuName = req.body.name;
+router.post('/add-menu', [verifyJWT, add(menus.Menus)] ,asyncHandler(async (req: Request, res: Response) => {
+    const menuName = req.body.name;    
 
     const validation = validateStringData(add_menu_schema, menuName);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);

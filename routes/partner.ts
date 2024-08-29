@@ -1,14 +1,15 @@
-import { Request, Response, Router } from "express";
-import asyncHandler from "../errors/asyncHandler";
-import { become_partner_validation, get_partner_request, update_partner_request } from "../validation/partnerValidation";
-import { validateObjectData } from "../lib/helpers/validation";
-import CustomError from "../errors/customError";
-import { PartnerRequest } from "../schemas/schema";
-import { response200 } from "../lib/helpers/utils";
+import bcrypt from 'bcrypt';
 import { FilterQuery } from "mongoose";
-import { IPartnerRequest } from "../types/types";
+import CustomError from "../errors/customError";
+import asyncHandler from "../errors/asyncHandler";
+import { response200 } from "../lib/helpers/utils";
+import { Request, Response, Router } from "express";
 import verifyJWT from "../middlewares/authentication";
+import { Admin, PartnerRequest } from "../schemas/schema";
+import { validateObjectData } from "../lib/helpers/validation";
 import { menus, update, view } from "../middlewares/permission";
+import { IPartnerRequest, PartnerRequestStatus } from "../types/types";
+import { become_partner_validation, get_partner_request, update_partner_request } from "../validation/partnerValidation";
 
 const router = Router();
 
@@ -73,7 +74,7 @@ router.get('/get-partner-requests', [verifyJWT, view(menus.Partner_Request)], as
                 venue_name: request.venue_name,
                 city: request.city,
                 address: request.address,
-                approved: request.approved
+                status: request.request_status
             }
         });
 
@@ -86,10 +87,32 @@ router.get('/get-partner-requests', [verifyJWT, view(menus.Partner_Request)], as
 router.post('/update-request', [verifyJWT, update(menus.Partner_Request)], asyncHandler(async (req: Request, res: Response) => {
     const reqData = req.body;
 
+    //Partner request data validation
     const validation = validateObjectData(update_partner_request, reqData);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
 
-    await PartnerRequest.findByIdAndUpdate(reqData.id, { approved: reqData.approved });
+    if (reqData.status == PartnerRequestStatus.ACCEPTED && (!reqData.first_name || !reqData.last_name || !reqData.email || !reqData.mobile || !reqData.password)) throw new CustomError("Partner details is required", 406);
+
+    const request = await PartnerRequest.findById(reqData.id);
+    if (!request || request.soft_delete) throw new CustomError("No request found", 404);
+
+    if (request.request_status === PartnerRequestStatus.ACCEPTED || request.request_status === PartnerRequestStatus.REJECTED) throw new CustomError("Request already updated", 406);
+
+    if (reqData.status == PartnerRequestStatus.ACCEPTED) {
+        const partner = await Admin.findOne({ email: reqData.email, soft_delete: false });
+        if (partner) throw new CustomError("Email already exists", 406);
+
+        const hashedPassword = await bcrypt.hash(reqData.password, 10);
+        await Admin.create({
+            first_name: reqData.first_name,
+            last_name: reqData.last_name,
+            email: reqData.email,
+            mobile: reqData.mobile,
+            password: hashedPassword
+        });
+    }
+
+    await PartnerRequest.findByIdAndUpdate(reqData.id, { request_status: reqData.status });
 
     const response = response200("Request updated successfully", { id: reqData.id });
     return res.status(response[0]).json(response[1]);

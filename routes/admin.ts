@@ -89,7 +89,7 @@ router.get('/get-authority-members', [verifyJWT, view(menus.Admins)], asyncHandl
     const user = req.user;
 
     if (!type) throw new CustomError("Type is required", 406);
-    if (type != 'admin' && type != 'subadmin') {
+    if (type != 'admin' && type != 'partner') {
         throw new CustomError("Type can be ['admin', 'subadmin'] only", 406);
     }
 
@@ -107,7 +107,7 @@ router.get('/get-authority-members', [verifyJWT, view(menus.Admins)], asyncHandl
     var regExp = new RegExp("true");
     reqQuery.is_active && (where.is_active = regExp.test(String(reqQuery.is_active)));
     type == 'admin' && (where.is_admin = true);
-    type == 'subadmin' && (where.is_subadmin = true);
+    type == 'partner' && (where.partner = true);
     reqQuery.search && (where.$or = [
         { first_name: { $regex: String(reqQuery.search), $options: 'i' } },
         { last_name: { $regex: String(reqQuery.search), $options: 'i' } },
@@ -142,7 +142,7 @@ router.get('/get-authority-members', [verifyJWT, view(menus.Admins)], asyncHandl
                 email: emp.email,
                 mobile: emp.mobile,
                 is_admin: emp.is_admin,
-                is_subadmin: emp.is_subadmin,
+                partner: emp.partner,
                 is_active: emp.is_active,
                 email_verified: emp.email_verified,
                 gender: emp.gender,
