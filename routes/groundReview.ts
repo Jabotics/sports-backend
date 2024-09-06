@@ -8,7 +8,7 @@ import { response200 } from "../lib/helpers/utils";
 import { Request, Response, Router } from "express";
 import verifyJWT from "../middlewares/authentication";
 import { validateArrayData, validateObjectData } from "../lib/helpers/validation";
-import { add_review_validation, get_reviews_validation, remove_review_schema, update_review_validation } from "../validation/groundReviewValidation";
+import { add_review_validation, get_reviews_validation, remove_review_schema, review_validation, update_review_validation } from "../validation/groundReviewValidation";
 
 const router = Router();
 
@@ -21,9 +21,14 @@ interface ReviewQuery extends FilterQuery<IGroundReview> {
     }
 }
 
-router.post('/add-review', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
+function hideNumber(mobile: string) {
+    return mobile.slice(-4).padStart(mobile.length, '*');        
+}
+
+router.post('/add-ground-review', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqData = req.body;
     const user = req.user;
+    console.log(user);
 
     if (!user) throw new CustomError("Session expired, please login again", 401);
 
@@ -41,7 +46,7 @@ router.post('/add-review', verifyJWT, asyncHandler(async (req: CustomRequest, re
     return res.status(response[0]).json(response[1]);
 }));
 
-router.get('/get-reviews', asyncHandler(async (req: Request, res: Response) => {
+router.get('/get-ground-reviews', asyncHandler(async (req: Request, res: Response) => {
     const reqQuery = req.query;
 
     const validation = validateObjectData(get_reviews_validation, reqQuery);
@@ -67,75 +72,7 @@ router.get('/get-reviews', asyncHandler(async (req: Request, res: Response) => {
     }
 
     const reviews = (await GroundReview.find(where)
-        .populate({ path: 'customer', select: ['first_name', 'last_name'], options: { strictPopulate: false } })
-        .populate({ path: 'ground', select: ['name'], options: { strictPopulate: false } })
-        .limit(Number(reqQuery.limit) || 10000)
-        .skip(Number(reqQuery.offset) || 0)
-    )
-        .map(review => {
-            return {
-                id: review._id,
-                review: review.review,
-                rating: review.rating,
-                ground: review.ground,
-                customer: review.customer,
-                is_active: review.is_active
-            }
-        });
-
-    const count = await GroundReview.countDocuments(where);
-
-    const response = response200("Reviews fetched successfully", { count, reviews });
-    return res.status(response[0]).json(response[1]);
-}));
-
-router.post('/update-review', asyncHandler(async (req: Request, res: Response) => {
-    const reqData = req.body;
-
-    const validation = validateObjectData(update_review_validation, reqData);
-    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
-
-    const data = {
-        review: reqData?.review,
-        rating: reqData?.rating
-    }
-
-    await GroundReview.findByIdAndUpdate(reqData.id, data);
-
-    const response = response200("Review updated successfully", {});
-    return res.status(response[0]).json(response[1]);
-}));
-
-router.post('/remove-review', asyncHandler(async (req: Request, res: Response) => {
-    const reqIds = req.body.academyIds;
-
-    const validation = validateArrayData(remove_review_schema, reqIds);
-    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
-
-    await GroundReview.updateMany(
-        { _id: { $in: reqIds } },
-        { $set: { soft_delete: true } },
-    );
-
-    const response = response200("Review removed successfully", {});
-    return res.status(response[0]).json(response[1]);
-}));
-
-router.get('/get-reviews', asyncHandler(async (req: Request, res: Response) => {
-    const reqQuery = req.query;
-
-    const validation = validateObjectData(get_reviews_validation, reqQuery);
-    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);    
-
-    const where: ReviewQuery = {
-        soft_delete: false,
-        ground: {
-            $in: [new Types.ObjectId(String(reqQuery.ground))]
-        }
-    }
-
-    const reviews = (await GroundReview.find(where)
-        .populate({ path: 'customer', select: ['first_name', 'last_name'], options: { strictPopulate: false } })
+        .populate({ path: 'customer', select: ['first_name', 'last_name', 'mobile'], options: { strictPopulate: false } })
         .populate({ path: 'ground', select: ['name'], options: { strictPopulate: false } })
         .limit(Number(reqQuery.limit) || 10000)
         .skip(Number(reqQuery.offset) || 0)
@@ -155,3 +92,76 @@ router.get('/get-reviews', asyncHandler(async (req: Request, res: Response) => {
     const response = response200("Reviews fetched successfully", { count, reviews });
     return res.status(response[0]).json(response[1]);
 }));
+
+router.post('/update-ground-review', asyncHandler(async (req: Request, res: Response) => {
+    const reqData = req.body;
+
+    const validation = validateObjectData(update_review_validation, reqData);
+    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
+
+    const data = {
+        review: reqData?.review,
+        rating: reqData?.rating
+    }
+
+    await GroundReview.findByIdAndUpdate(reqData.id, data);
+
+    const response = response200("Review updated successfully", {});
+    return res.status(response[0]).json(response[1]);
+}));
+
+router.post('/remove-ground-review', asyncHandler(async (req: Request, res: Response) => {
+    const reqIds = req.body.reviewIds;
+
+    const validation = validateArrayData(remove_review_schema, reqIds);
+    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
+
+    await GroundReview.updateMany(
+        { _id: { $in: reqIds } },
+        { $set: { soft_delete: true } },
+    );
+
+    const response = response200("Review removed successfully", {});
+    return res.status(response[0]).json(response[1]);
+}));
+
+router.get('/ground-reviews', asyncHandler(async (req: Request, res: Response) => {
+    const reqQuery = req.query;
+
+    const validation = validateObjectData(review_validation, reqQuery);
+    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
+
+    const where: ReviewQuery = {
+        soft_delete: false,
+        ground: {
+            $in: [new Types.ObjectId(String(reqQuery.ground))]
+        }
+    }
+
+    const reviews = (await GroundReview.find(where)
+        .populate({ path: 'customer', select: ['first_name', 'last_name', 'mobile'], options: { strictPopulate: false } })
+        .populate({ path: 'ground', select: ['name'], options: { strictPopulate: false } })
+        .limit(Number(reqQuery.limit) || 10000)
+        .skip(Number(reqQuery.offset) || 0)
+    )
+        .map(review => {
+            let customer = {
+                name: review.customer && 'first_name' in review.customer && 'last_name' in review.customer && `${review.customer.first_name} ${review.customer.last_name}`,
+                mobile: review.customer && 'mobile' in review.customer && hideNumber((String(review.customer.mobile)))
+            }            
+            return {
+                id: review._id,
+                review: review.review,
+                rating: review.rating,
+                ground: review.ground,
+                customer,
+            }
+        });
+
+    const count = await GroundReview.countDocuments(where);
+
+    const response = response200("Reviews fetched successfully", { count, reviews });
+    return res.status(response[0]).json(response[1]);
+}));
+
+export default router;

@@ -28,5 +28,6 @@ export { default as slotBookingRoutes } from './slotBooking';
 export { default as dashboardRoutes } from './dashboardData';
 export { default as venueExpenseRoutes } from './venueExpense';
 export { default as eventRequestRoutes } from './eventRequest';
+export { default as groundReviewRoutes } from './groundReview';
 export { default as happyCustomerRoutes } from './happyCustomer';
 export { default as academyStudentRoutes } from './academyStudents';

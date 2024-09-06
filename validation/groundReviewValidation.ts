@@ -1,7 +1,6 @@
 import Joi from 'joi';
 
-const add_review_validation = Joi.object({
-    customer: Joi.string().required().min(10),
+const add_review_validation = Joi.object({    
     ground: Joi.string().required().min(10),
     review: Joi.string().required().min(2),
     rating: Joi.number().positive().max(1).valid(0,1,2,3,4,5).required()

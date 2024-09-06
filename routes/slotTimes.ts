@@ -28,7 +28,7 @@ const router = Router();
 
 router.post('/add-slot-time', [verifyJWT, add(menus.Slot_Times)], asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqData = req.body;
-    const user = req.user;
+    const user = req.user;    
 
     if (!user) throw new CustomError("Permission denied", 403);
     if ('ground' in user && Array.isArray(user.ground) && user.ground.length != 0 && !user.ground.includes(reqData.ground)) throw new CustomError("Permission denied", 403);
@@ -42,18 +42,15 @@ router.post('/add-slot-time', [verifyJWT, add(menus.Slot_Times)], asyncHandler(a
     const ground = await Ground.findOne({ _id: reqData.ground, is_active: true, soft_delete: false });
     if (!ground) throw new CustomError("Ground does not exist or is disabled", 406);
 
-    const cityCount = await City.countDocuments({ _id: reqData.city, is_active: true, soft_delete: false });
-    if (cityCount == 0) throw new CustomError("City does not exist or is disabled", 406);
-
     const venue = await Venue.findOne({ _id: reqData.venue, is_active: true, soft_delete: false });
     if (!venue) throw new CustomError("Venue does not exist or is disabled", 406);
 
     if (ground.venue != reqData.venue) throw new CustomError("The venue doesn't have the ground you selected", 406);
-    if (venue.city != reqData.city) throw new CustomError("The city doesn't have the venue you selected", 406);
-
-    const slot = await SlotTime.create({
+    if (venue.city != user.city._id) throw new CustomError("The city doesn't have the venue you selected", 406);
+    
+    const slot = await SlotTime.create({        
         slot: reqData.slot,
-        city: reqData.city,
+        city: user.city._id,
         venue: reqData.venue,
         price: reqData.price,
         ground: reqData.ground,

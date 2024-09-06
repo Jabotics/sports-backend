@@ -11,8 +11,7 @@ const price_schema = Joi.object({
 })
 
 const add_slot_time_schema = Joi.object({
-    ground: Joi.string().required(),
-    city: Joi.string().required(),
+    ground: Joi.string().required(),    
     venue: Joi.string().required(),
     slot: Joi.string().min(10).required(),
     price: price_schema,

@@ -16,7 +16,7 @@ enum Gender {
 enum AddedBy {
     SA = 'SA', // SA (Super Admin)
     AD = 'AD', // AD (Admin) 
-    SUB = 'SUB'
+    PN = 'PN'
 }
 
 enum EventRegistrationStatus {
@@ -156,8 +156,7 @@ interface IRole extends Document {
 }
 
 interface IVenue extends Document {
-    name: string;
-    type: string;
+    name: string;    
     address: string;
     image?: string[];
     video?: string[];
@@ -538,8 +537,7 @@ interface IGroundReview extends Document {
     customer: Types.ObjectId;
     ground: Types.ObjectId;
     review: string;
-    rating: number;
-    is_active: boolean;
+    rating: number;    
     soft_delete: boolean;
 }
 

@@ -53,17 +53,17 @@ interface ground_data {
 
 const router = Router();
 
-router.post('/add-ground', [verifyJWT, add(menus.Grounds)], asyncHandler(async (req: CustomRequest, res: Response) => {
+router.post('/add-ground', [verifyJWT, add(menus.Grounds)] ,asyncHandler(async (req: CustomRequest, res: Response) => {
     let reqData = req.body;
     reqData = { ...reqData, supported_sports: reqData.supported_sports && JSON.parse(reqData.supported_sports) };
     const user = req.user;
-    const reqFiles = req.files;
+    const reqFiles = req.files;        
 
     if (!user) throw new CustomError("Permission denied", 403);
+    if('partner' in user && user.partner) throw new CustomError("Permission denied", 403);
 
     const validation = validateObjectData(add_ground_schema, reqData);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
-
 
     if (Array.isArray(reqFiles) && reqFiles?.length != 0) {
         const imgValidation = validateArrayData(update_ground_image_schema, reqFiles);
@@ -75,10 +75,6 @@ router.post('/add-ground', [verifyJWT, add(menus.Grounds)], asyncHandler(async (
 
     const count = await Venue.countDocuments({ _id: reqData.venue, is_active: true, soft_delete: false });
     if (count == 0) throw new CustomError("Venue does not exist or is disabled", 406);
-
-    if (user && user.is_subadmin && 'venue' in user && Array.isArray(user.venue) && !user.venue.includes(reqData.venue)) {
-        throw new CustomError("Permission denied", 403);
-    }
 
     if ('venue' in user && Array.isArray(reqData.venue) && reqData.venue.length != 0 && !user.venue.includes(reqData.venue)) throw new CustomError("Permission denied", 403);
 
@@ -312,6 +308,7 @@ router.post('/update-ground', [verifyJWT, update(menus.Grounds)], asyncHandler(a
     const user = req.user;
 
     if (!user) throw new CustomError("Permission denied", 403);
+    if('partner' in user && user.partner) throw new CustomError("Permission denied", 403);
 
     const validation = validateObjectData(update_ground_schema, reqData);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);

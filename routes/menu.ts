@@ -8,7 +8,7 @@ import { FilterQuery, SortOrder } from "mongoose";
 import { Request, Response, Router } from "express";
 import verifyJWT from "../middlewares/authentication";
 import { add, menus, remove, update, view } from "../middlewares/permission";
-import { adminMenuArr, response200, subadminMenuArr, superadminMenuArr } from "../lib/helpers/utils";
+import { adminMenuArr, response200, partnerMenuArr, superadminMenuArr } from "../lib/helpers/utils";
 import { validateArrayData, validateObjectData, validateStringData } from "../lib/helpers/validation";
 import { add_menu_schema, get_menu_schema, remove_menu_schema, update_menu_schema } from "../validation/menuValidation";
 
@@ -20,8 +20,8 @@ interface MenuQuery extends FilterQuery<IMenu> {
 
 const router = Router();
 
-router.post('/add-menu', [verifyJWT, add(menus.Menus)] ,asyncHandler(async (req: Request, res: Response) => {
-    const menuName = req.body.name;    
+router.post('/add-menu', [verifyJWT, add(menus.Menus)], asyncHandler(async (req: Request, res: Response) => {
+    const menuName = req.body.name;
 
     const validation = validateStringData(add_menu_schema, menuName);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
@@ -84,7 +84,7 @@ router.get('/get-menus', [verifyJWT, view(menus.Menus)], asyncHandler(async (req
         count = menus.length;
     }
     else if (user && 'is_subadmin' in user && user.is_subadmin) {
-        menus = menus.filter(menu => subadminMenuArr.includes(menu.name));
+        menus = menus.filter(menu => partnerMenuArr.includes(menu.name));
         count = menus.length;
     }
 
@@ -153,8 +153,8 @@ router.get('/fetch-menus', verifyJWT, asyncHandler(async (req: CustomRequest, re
     else if (user && (('is_admin' in user && user.is_admin) || ('added_by' in user && user.added_by == 'AD'))) {
         menus = menus.filter(menu => adminMenuArr.includes(menu.name));
     }
-    else if (user && 'is_subadmin' in user && user.is_subadmin) {
-        menus = menus.filter(menu => subadminMenuArr.includes(menu.name));
+    else if (user && 'partner' in user && user.partner) {
+        menus = menus.filter(menu => partnerMenuArr.includes(menu.name));
     }
 
     const response = response200("", menus);

@@ -319,10 +319,6 @@ const venueSchema = new Schema<IVenue>({
         type: String,
         required: true
     },
-    type: {
-        type: String,
-        required: true
-    },
     address: {
         type: String,
         default: ""
@@ -1571,10 +1567,6 @@ const groundReviewSchema = new Schema<IGroundReview>({
     rating: {
         type: Number,
         required: true
-    },
-    is_active: {
-        type: Boolean,
-        default: true
     },
     soft_delete: {
         type: Boolean,

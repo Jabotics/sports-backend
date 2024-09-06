@@ -358,7 +358,7 @@ router.get('/venue-financials', verifyJWT, asyncHandler(async (req: Request, res
 
     const membership_fees = await findMembershipFees(dates, undefined, [String(reqQuery.venue)]);
 
-    const venue_expenses = await findVenueExp(dates, [String(reqQuery.venue)], venue.type);
+    // const venue_expenses = await findVenueExp(dates, [String(reqQuery.venue)], venue.type);
 
     const reservation_amount = await findReservationAmount(dates, undefined, [String(reqQuery.venue)]);
 
@@ -373,9 +373,9 @@ router.get('/venue-financials', verifyJWT, asyncHandler(async (req: Request, res
             total_membership_fee: membership_fees,
             total_reservation_amount: reservation_amount,
             total_income: booking_amount + academy_fees + membership_fees + reservation_amount,
-            total_venue_expense: venue_expenses,
+            // total_venue_expense: venue_expenses,
             employee_salary: employee_salary,
-            profit: (booking_amount + academy_fees + membership_fees + reservation_amount) - venue_expenses
+            // profit: (booking_amount + academy_fees + membership_fees + reservation_amount) - venue_expenses
         }
     );
     return res.status(response[0]).json(response[1]);
@@ -564,9 +564,9 @@ router.get('/all-financial-data', verifyJWT, asyncHandler(async (req: CustomRequ
         let partner = false;
         if (user.venue && Array.isArray(user.venue) && user.venue.length != 0) {
             const venue = await Venue.findOne({ city: user.city, _id: user.venue[0] });
-            if (venue && venue.type == 'Partner') {
-                partner = true;
-            }
+            // if (venue && venue.type == 'Partner') {
+            //     partner = true;
+            // }
         }
 
         let total_salary_expenses = 0;

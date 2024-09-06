@@ -38,7 +38,7 @@ router.post('/add-emp', [verifyJWT, add(menus.Employees)], asyncHandler(async (r
     const validation = validateObjectData(add_employee_schema, reqData);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
 
-    if ((('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB')) && reqData.venue && Array.isArray(reqData.venue) && reqData.venue.length == 0) throw new CustomError("Venue is required", 406);
+    if ((('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN')) && reqData.venue && Array.isArray(reqData.venue) && reqData.venue.length == 0) throw new CustomError("Venue is required", 406);
 
     const findExisting = await Employee.findOne({ email: reqData.email, soft_delete: false });
     if (findExisting && findExisting.email_verified) throw new CustomError("Email already registered", 409);
@@ -58,10 +58,10 @@ router.post('/add-emp', [verifyJWT, add(menus.Employees)], asyncHandler(async (r
         data.added_by = 'AD';
         data.city = user.city._id;
     }
-    else if (user && (('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB'))) {
+    else if (user && (('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN'))) {
         let checkVenuePerm = reqData.venue.every((id: any) => user.venue.includes(id));
         if (!checkVenuePerm) throw new CustomError("Permission denied", 403);
-        data.added_by = 'SUB';
+        data.added_by = 'PN';
         data.venue = reqData.venue
         data.city = user.city._id;
     }
@@ -146,8 +146,7 @@ router.get('/get-all-employees', [verifyJWT, view(menus.Employees)], asyncHandle
         is_active: req.query.is_active && JSON.parse(String(reqQuery.is_active))
     }
     const user = req.user;
-
-
+    
     if (!user) throw new CustomError("Permission denied", 403);
 
     //Validating requested data
@@ -187,12 +186,12 @@ router.get('/get-all-employees', [verifyJWT, view(menus.Employees)], asyncHandle
     }
     else if (('is_admin' in user && user.is_admin) || ('added_by' in user && user.added_by == 'AD')) {
         where.added_by = {
-            $in: [AddedBy.AD, AddedBy.SUB]
+            $in: [AddedBy.AD]
         }
     }
     else {
         where.added_by = {
-            $in: [AddedBy.SUB]
+            $in: [AddedBy.PN]
         }
     }
 

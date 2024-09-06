@@ -28,10 +28,14 @@ const update_partner_request = Joi.object({
         'string.min': 'Password must be at least 8 characters long',
         'string.pattern.base': 'Password must contain only letters, numbers, and special characters'
     }),
+    city: Joi.string() .required()
 });
+
+const remove_request_schema = Joi.array().items(Joi.string().required()).required();
 
 export {
     get_partner_request,    
+    remove_request_schema,
     update_partner_request,
     become_partner_validation,
 }

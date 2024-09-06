@@ -1,15 +1,16 @@
 import bcrypt from 'bcrypt';
 import { FilterQuery } from "mongoose";
+import { CustomRequest } from '../server';
 import CustomError from "../errors/customError";
 import asyncHandler from "../errors/asyncHandler";
 import { response200 } from "../lib/helpers/utils";
 import { Request, Response, Router } from "express";
 import verifyJWT from "../middlewares/authentication";
 import { Admin, PartnerRequest } from "../schemas/schema";
-import { validateObjectData } from "../lib/helpers/validation";
 import { menus, update, view } from "../middlewares/permission";
 import { IPartnerRequest, PartnerRequestStatus } from "../types/types";
-import { become_partner_validation, get_partner_request, update_partner_request } from "../validation/partnerValidation";
+import { validateArrayData, validateObjectData } from "../lib/helpers/validation";
+import { become_partner_validation, get_partner_request, remove_request_schema, update_partner_request } from "../validation/partnerValidation";
 
 const router = Router();
 
@@ -42,8 +43,11 @@ router.post('/become-partner', asyncHandler(async (req: Request, res: Response) 
     return res.status(response[0]).json(response[1]);
 }));
 
-router.get('/get-partner-requests', [verifyJWT, view(menus.Partner_Request)], asyncHandler(async (req: Request, res: Response) => {
+router.get('/get-partner-requests', [verifyJWT, view(menus.Partner_Request)], asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqQuery = req.query;
+    const user = req.user;
+
+    if(!user) throw new CustomError("Permission denied", 401);
 
     const validation = validateObjectData(get_partner_request, reqQuery);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
@@ -59,8 +63,12 @@ router.get('/get-partner-requests', [verifyJWT, view(menus.Partner_Request)], as
     }
     reqQuery.city && (where.city = String(reqQuery.city));
 
+    if('city' in user && user.city) {
+        where.city = user.city._id;
+    }
+
     const requests = (await PartnerRequest.find(where)
-        .populate({ path: 'city', select: ['name', '-_id'], options: { strictPopulate: false } })
+        .populate({ path: 'city', select: ['name', '_id'], options: { strictPopulate: false } })
         .limit(Number(reqQuery.limit) || 10000)
         .skip(Number(reqQuery.offset) || 0)
     )
@@ -108,13 +116,31 @@ router.post('/update-request', [verifyJWT, update(menus.Partner_Request)], async
             last_name: reqData.last_name,
             email: reqData.email,
             mobile: reqData.mobile,
-            password: hashedPassword
+            password: hashedPassword,
+            partner: true,
+            email_verified: true,
+            city: reqData.city
         });
     }
 
     await PartnerRequest.findByIdAndUpdate(reqData.id, { request_status: reqData.status });
 
     const response = response200("Request updated successfully", { id: reqData.id });
+    return res.status(response[0]).json(response[1]);
+}));
+
+router.post('/remove-partner-request', asyncHandler(async (req: Request, res: Response) => {
+    const reqIds = req.body.requestIds;
+
+    const validation = validateArrayData(remove_request_schema, reqIds);
+    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
+
+    await PartnerRequest.updateMany(
+        { _id: { $in: reqIds } },
+        { $set: { soft_delete: true } },
+    );
+
+    const response = response200("Review removed successfully", {});
     return res.status(response[0]).json(response[1]);
 }));
 

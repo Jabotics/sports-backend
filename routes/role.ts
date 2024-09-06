@@ -33,7 +33,7 @@ router.post('/add-role', [verifyJWT, add(menus.Roles)], asyncHandler(async (req:
         throw new CustomError("City is required", 406);
     }
 
-    if ((('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB')) && !reqData.venue) {
+    if ((('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN')) && !reqData.venue) {
         throw new CustomError("Venue is required", 406);
     }
 
@@ -76,8 +76,8 @@ router.post('/add-role', [verifyJWT, add(menus.Roles)], asyncHandler(async (req:
     else if (user && (('is_admin' in user && user.is_admin) || ('added_by' in user && user.added_by == 'AD'))) {
         data.added_by = 'AD'
     }
-    else if (user && (('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB'))) {
-        data.added_by = 'SUB'
+    else if (user && (('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN'))) {
+        data.added_by = 'PN'
     }
 
     const newRole = await Role.create(data);
@@ -105,14 +105,14 @@ router.get('/get-all-roles', [verifyJWT, view(menus.Roles)], asyncHandler(async 
     else if ('added_by' in user && user.added_by == 'AD') {
         where.city = new Types.ObjectId(String(user.city._id));
     }
-    else if ('is_subadmin' in user && user.is_subadmin) {
+    else if ('partner' in user && user.partner) {
         where.city = new Types.ObjectId(String(user.city._id));
         const venueIds = user.venue.map((id: any) => {
             return new Types.ObjectId(String(id));
         });
         where.venue = { $in: venueIds };
     }
-    else if ('added_by' in user && user.added_by == 'SUB') {
+    else if ('added_by' in user && user.added_by == 'PN') {
         where.city = new Types.ObjectId(String(user.city._id));
         const venueIds = user.venue.map((id: any) => {
             return new Types.ObjectId(String(id));
@@ -133,13 +133,13 @@ router.get('/get-all-roles', [verifyJWT, view(menus.Roles)], asyncHandler(async 
     else if ((('is_admin' in user && user.is_admin) || ('added_by' in user && user.added_by == 'AD'))) {
         where.added_by = 'AD'
     }
-    else if ((('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB'))) {
-        where.added_by = 'SUB'
+    else if ((('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN'))) {
+        where.added_by = 'PN'
     }
 
     var regExp = new RegExp("true");
     reqQuery.is_active && (where.is_active = regExp.test(String(reqQuery.is_active)));
-    reqQuery.id && (where._id = new Types.ObjectId(String(reqQuery.id)));
+    reqQuery.id && (where._id = new Types.ObjectId(String(reqQuery.id)));    
 
     const roles = (await Role.find(where)
         .skip(Number(reqQuery.offset))
@@ -176,7 +176,7 @@ router.post('/update-role', [verifyJWT, update(menus.Roles)], asyncHandler(async
         throw new CustomError("City is required", 406);
     }
 
-    if ((('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB')) && !reqData.venue) {
+    if ((('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN')) && !reqData.venue) {
         throw new CustomError("Venue is required", 406);
     }
 
@@ -195,7 +195,7 @@ router.post('/update-role', [verifyJWT, update(menus.Roles)], asyncHandler(async
         delete data.city;
     }
 
-    if ((('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB'))) {
+    if ((('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN'))) {
         data.city = reqData?.venue
     }
     else {
@@ -241,7 +241,7 @@ router.get('/fetch-roles', verifyJWT, asyncHandler(async (req: CustomRequest, re
         is_active: true
     };
 
-    if (user && (('is_subadmin' in user && user.is_subadmin) || ('added_by' in user && user.added_by == 'SUB')) && !reqQuery.venue) {
+    if (user && (('partner' in user && user.partner) || ('added_by' in user && user.added_by == 'PN')) && !reqQuery.venue) {
         throw new CustomError("Venue is required", 406);
     }
 
@@ -256,7 +256,7 @@ router.get('/fetch-roles', verifyJWT, asyncHandler(async (req: CustomRequest, re
         where.added_by = 'AD'
     }
     else {
-        where.added_by = 'SUB'
+        where.added_by = 'PN'
     }
 
     if ('city' in user && user.city) {

@@ -5,8 +5,7 @@ const add_venue_schema = Joi.object({
     city: Joi.string().required(),
     name: Joi.string().min(2).required(),
     address: Joi.string().min(5).required(),
-    geo_location: Joi.string().required().allow(String()),
-    type: Joi.string().required().valid('Partnership', 'Owned'),
+    geo_location: Joi.string().required().allow(String()),    
     supported_sports: Joi.array().items(Joi.string().required()).required(),
 });
 
@@ -28,8 +27,7 @@ const update_venue_schema = Joi.object({
     address: Joi.string().min(5),
     city: Joi.string().required(),
     geo_location: Joi.string().allow(String()),
-    deleted_files: Joi.array().items(Joi.string()),
-    type: Joi.string().valid('Partnership', 'Owned'),
+    deleted_files: Joi.array().items(Joi.string()),    
     supported_sports: Joi.array().items(Joi.string()),
 });
 

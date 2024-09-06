@@ -55,17 +55,18 @@ const add = (menu_name: string) => {
                     select: 'name'
                 });
                 let permission = roles?.permissions.find((permission: any) => permission.menu.name == menu_name);
-
+                
                 const response = response403("Permission denied");
                 if (user && (user.is_superadmin || user.is_admin)) {
                     next();
                     return;
                 }
                 else if (user
-                    && user.is_subadmin && (menu_name == menus.Grounds
+                    && user.partner && (menu_name == menus.Grounds
                         || menu_name == menus.Employees
-                        || menu_name == menus.Roles
+                        || menu_name == menus.Roles            
                         || menu_name == menus.Slot_Times
+                        || menu_name == menus.Slot_Bookings
                         || menu_name == menus.Expenses
                         || menu_name == menus.Reservation
                     )
@@ -114,11 +115,13 @@ const view = (menu_name: string) => {
                     return;
                 }
                 else if (user
-                    && user.is_subadmin && (menu_name == menus.Grounds
+                    && user.partner && (menu_name == menus.Grounds
                         || menu_name == menus.Employees
                         || menu_name == menus.Roles
                         || menu_name == menus.Slot_Times
+                        || menu_name == menus.Slot_Bookings
                         || menu_name == menus.Expenses
+                        || menu_name == menus.Reservation
                     )) {
                     next();
                     return;
@@ -165,11 +168,13 @@ const update = (menu_name: string) => {
                     return;
                 }
                 else if (user
-                    && user.is_subadmin && (menu_name == menus.Grounds
+                    && user.partner && (menu_name == menus.Grounds
                         || menu_name == menus.Employees
                         || menu_name == menus.Roles
                         || menu_name == menus.Slot_Times
+                        || menu_name == menus.Slot_Bookings
                         || menu_name == menus.Expenses
+                        || menu_name == menus.Reservation
                     )) {
                     next();
                     return;
@@ -216,11 +221,13 @@ const remove = (menu_name: string) => {
                     return;
                 }
                 else if (user &&
-                    user.is_subadmin && (menu_name == menus.Grounds
+                    user.partner && (menu_name == menus.Grounds
                         || menu_name == menus.Employees
                         || menu_name == menus.Roles
                         || menu_name == menus.Slot_Times
+                        || menu_name == menus.Slot_Bookings
                         || menu_name == menus.Expenses
+                        || menu_name == menus.Reservation
                     )) {
                     next();
                     return;

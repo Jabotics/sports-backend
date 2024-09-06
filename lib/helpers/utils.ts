@@ -152,9 +152,9 @@ const getUserData = async (userId: string, type: string) => {
             });
         });
     }
-    else if ('is_subadmin' in emp[0] && emp[0].is_subadmin) {
-        const subadminMenu = allMenus.filter(menu => subadminMenuArr.includes(menu));
-        subadminMenu.forEach(menu => {
+    else if ('partner' in emp[0] && emp[0].partner) {
+        const partnerMenu = allMenus.filter(menu => partnerMenuArr.includes(menu));
+        partnerMenu.forEach(menu => {
             payload.menu.push({
                 name: menu,
                 add: true,
@@ -274,11 +274,11 @@ const uploadPaths = {
     "academies": "./uploads/academies",
 }
 
-const superadminMenuArr = ['CITIES', 'INQUIRIES', 'PAYMENTS', 'EVENTS', 'EMPLOYEES', 'ROLES', 'ADMINS', 'SPORTS', 'SUPPORT', 'CUSTOMERS', 'HOMEPAGE', 'EVENT_REQUEST', 'FAQ', 'BLOGS', 'HAPPY_CUSTOMERS', 'FEEDBACK', 'PARTNER_REQUEST'];
+const superadminMenuArr = ['CITIES', 'INQUIRIES', 'PAYMENTS', 'EVENTS', 'EMPLOYEES', 'ROLES', 'ADMINS', 'SPORTS', 'SUPPORT', 'CUSTOMERS', 'HOMEPAGE', 'EVENT_REQUEST', 'FAQ', 'BLOGS', 'HAPPY_CUSTOMERS', 'FEEDBACK', 'PARTNER_REQUEST', 'PARTNERS'];
 
-const adminMenuArr = ['EMPLOYEES', 'ROLES', 'VENUES', 'GROUNDS', 'SLOT_TIMES', 'ACADEMIES', 'MEMBERSHIPS', 'SUB_ADMINS', 'EXPENSES', 'SLOT_BOOKINGS', 'PROMO_CODES', 'STUDENTS', 'MEMBERS', 'RESERVATION']
+const adminMenuArr = ['EMPLOYEES', 'ROLES', 'VENUES', 'GROUNDS', 'PARTNERS', 'PARTNER_REQUEST' ,'EXPENSES', 'PROMO_CODES']
 
-const subadminMenuArr = ['GROUNDS', 'EMPLOYEES', 'SLOT_TIMES', 'ROLES', 'EXPENSES', 'SLOT_BOOKINGS', 'PROMO_CODES', 'STUDENTS', 'MEMBERS', 'RESERVATION'];
+const partnerMenuArr = ['EMPLOYEES', 'SLOT_TIMES', 'ROLES', 'EXPENSES', 'SLOT_BOOKINGS', 'RESERVATION'];
 
 export {
     findFile,
@@ -292,7 +292,7 @@ export {
     uploadPaths,
     getUserData,
     adminMenuArr,
-    subadminMenuArr,
+    partnerMenuArr,
     capitalizeString,
     superadminMenuArr,
     generateFrontEndURL,

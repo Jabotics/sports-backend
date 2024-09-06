@@ -90,7 +90,7 @@ router.get('/get-authority-members', [verifyJWT, view(menus.Admins)], asyncHandl
 
     if (!type) throw new CustomError("Type is required", 406);
     if (type != 'admin' && type != 'partner') {
-        throw new CustomError("Type can be ['admin', 'subadmin'] only", 406);
+        throw new CustomError("Type can be ['admin', 'partner'] only", 406);
     }
 
     if (!user) throw new CustomError("Permission denied", 403);
@@ -126,7 +126,7 @@ router.get('/get-authority-members', [verifyJWT, view(menus.Admins)], asyncHandl
     } else {
         sortOptions.push(["createdAt", 1]);
     }
-
+    
     //Fetching data from database
     const admins = (await Admin.find(where)
         .skip(Number(reqQuery.offset))
@@ -168,7 +168,7 @@ router.get('/get-authority-members', [verifyJWT, view(menus.Admins)], asyncHandl
     }
     const count = await Admin.countDocuments(where);
 
-    const response = response200("All admins fetched successfully", { count, admins });
+    const response = response200(`All ${type == 'admin' ? "admins" : "partners"} fetched successfully`, { count, admins });
     return res.status(response[0]).json(response[1]);
 }));
 
@@ -262,7 +262,7 @@ router.post('/update-authority-member', [verifyJWT, update(menus.Admins)], async
         { $set: data },
     )
 
-    const response = response200(`${type == 'admin' ? 'Admin' : 'Subadmin'} updated successfully`, {});
+    const response = response200(`${type == 'admin' ? 'Admin' : 'Partner'} updated successfully`, {});
     return res.status(response[0]).json(response[1]);
 }));
 

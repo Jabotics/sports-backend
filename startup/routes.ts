@@ -38,6 +38,7 @@ import {
     feedbackRoutes,
     happyCustomerRoutes,
     partnerRequestRoutes,
+    groundReviewRoutes,
 } from "../routes";
 
 const multipartDataHandler = multer().any();
@@ -59,7 +60,7 @@ export default async function (app: Express) {
     await connectDB();
 
     //API Routes
-    let routes = [faqRoutes, empRoutes, cityRoutes, menuRoutes, blogRoutes, chatRoutes, roleRoutes, authRoutes, adminRoutes, sportRoutes, venueRoutes, eventRoutes, memberRoutes, bannerRoutes, groundRoutes, paymentRoutes, settingRoutes, inquiryRoutes, academyRoutes, slotTimeRoutes, customerRoutes, feedbackRoutes, promoCodeRoutes, dashboardRoutes, membershipRoutes, slotBookingRoutes, reserveSlotRoutes, venueExpenseRoutes, eventRequestRoutes, happyCustomerRoutes, academyStudentRoutes, partnerRequestRoutes];
+    let routes = [faqRoutes, empRoutes, cityRoutes, menuRoutes, blogRoutes, chatRoutes, roleRoutes, authRoutes, adminRoutes, sportRoutes, venueRoutes, eventRoutes, memberRoutes, bannerRoutes, groundRoutes, paymentRoutes, settingRoutes, inquiryRoutes, academyRoutes, slotTimeRoutes, customerRoutes, feedbackRoutes, promoCodeRoutes, dashboardRoutes, membershipRoutes, slotBookingRoutes, reserveSlotRoutes, venueExpenseRoutes, eventRequestRoutes, happyCustomerRoutes, academyStudentRoutes, partnerRequestRoutes, groundReviewRoutes];
 
     for (let i in routes) {
         app.use('/api', routes[i]);

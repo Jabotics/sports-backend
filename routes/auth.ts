@@ -9,7 +9,7 @@ import verifyJWT from "../middlewares/authentication";
 import { login_schema } from "../validation/authValidation";
 import { validateObjectData } from "../lib/helpers/validation";
 import { Admin, BlacklistedToken, Employee, Menu, Role } from '../schemas/schema';
-import { adminMenuArr, response200, subadminMenuArr, superadminMenuArr } from "../lib/helpers/utils";
+import { adminMenuArr, response200, partnerMenuArr, superadminMenuArr } from "../lib/helpers/utils";
 
 const router = Router();
 
@@ -109,7 +109,7 @@ router.get('/verify-session', verifyJWT, asyncHandler(async (req: CustomRequest,
         profile_image: employee.profile_image,
         city: 'city' in employee ? employee.city : null,
         is_admin: 'is_admin' in employee ? employee.is_admin : undefined,
-        is_subadmin: 'is_subadmin' in employee ? employee.is_subadmin : undefined,
+        partner: 'partner' in employee ? employee.partner : undefined,
         is_superadmin: 'is_superadmin' in employee ? employee.is_superadmin : undefined,
         venue: 'venue' in employee ? employee.venue : null,
         role: 'role' in employee ? employee.role : undefined,
@@ -147,10 +147,10 @@ router.get('/verify-session', verifyJWT, asyncHandler(async (req: CustomRequest,
             });
         });
     }
-    else if ('is_subadmin' in employee && employee.is_subadmin) {
-        payload.is_subadmin = true;
+    else if ('partner' in employee && employee.partner) {
+        payload.partner = true;
         delete payload.added_by;
-        const subadminMenu = allMenus.filter(menu => subadminMenuArr.includes(menu));
+        const subadminMenu = allMenus.filter(menu => partnerMenuArr.includes(menu));
         subadminMenu.forEach(menu => {
             payload.menu.push({
                 name: menu,
@@ -165,7 +165,7 @@ router.get('/verify-session', verifyJWT, asyncHandler(async (req: CustomRequest,
     else if ('role' in employee && employee.role) {
         delete payload.is_superadmin;
         delete payload.is_admin;
-        delete payload.is_subadmin;
+        delete payload.partner;
         const role = await Role.findById({ _id: employee.role }).populate({
             path: 'permissions.menu',
             select: 'name'
@@ -184,7 +184,7 @@ router.get('/verify-session', verifyJWT, asyncHandler(async (req: CustomRequest,
     else {
         delete payload.is_superadmin;
         delete payload.is_admin;
-        delete payload.is_subadmin;
+        delete payload.partner;
     }
 
     const response = response200("Session verified ", payload);
@@ -228,7 +228,7 @@ router.post('/authority-login', asyncHandler(async (req: Request, res: Response)
         city: 'city' in admin && admin.city,
         venue: 'venue' in admin ? admin.venue : null,
         is_admin: 'is_admin' in admin ? admin.is_admin : undefined,
-        is_subadmin: 'is_subadmin' in admin ? admin.is_subadmin : undefined,
+        partner: 'partner' in admin ? admin.partner : undefined,
         is_superadmin: 'is_superadmin' in admin ? admin.is_superadmin : undefined,
         menu: Array(),
     }
@@ -265,9 +265,9 @@ router.post('/authority-login', asyncHandler(async (req: Request, res: Response)
             });
         });
     }
-    else if ('is_subadmin' in admin && admin.is_subadmin) {
-        const subadminMenu = allMenus.filter(menu => subadminMenuArr.includes(menu));
-        subadminMenu.forEach(menu => {
+    else if ('partner' in admin && admin.partner) {
+        const partnerMenu = allMenus.filter(menu => partnerMenuArr.includes(menu));
+        partnerMenu.forEach(menu => {
             payload.menu.push({
                 name: menu,
                 add: true,

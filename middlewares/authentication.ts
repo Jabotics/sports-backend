@@ -7,7 +7,7 @@ import { response403, response406 } from '../lib/helpers/utils';
 
 const verifyJWT = async (req: CustomRequest, res: Response, next: NextFunction) => {
     const payload = req.headers.authorization;    
-
+    
     if (!payload) {
         const response = response406("Authorization token not present in the header");
         return res.status(response[0]).json(response[1]);
@@ -29,8 +29,8 @@ const verifyJWT = async (req: CustomRequest, res: Response, next: NextFunction) 
         const secretkey = String(config.get('jwt_secretkey')) || "";
         const data = jwt.verify(token[1], secretkey) as JwtPayload;
         delete data.iat;
-        delete data.exp
-        req.user = data;        
+        delete data.exp        
+        req.user = data;                
         // let response = response403("Token blacklisted, please login again");
         // return res.status(response[0]).json(response[1]);
         next();
