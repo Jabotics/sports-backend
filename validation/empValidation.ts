@@ -23,13 +23,12 @@ const get_all_employees_schema = Joi.object({
     search: Joi.string(),
     limit: Joi.number().positive(),
     offset: Joi.number().positive().allow(0),
-    is_active: Joi.array().items(Joi.boolean()),    
+    is_active: Joi.array().items(Joi.boolean()),
 });
 
 const update_employee_schema = Joi.object({
     role: Joi.string(),
     is_active: Joi.boolean(),
-    is_subadmin: Joi.boolean(),
     id: Joi.string().required(),
     last_name: Joi.string().min(2),
     first_name: Joi.string().min(2),

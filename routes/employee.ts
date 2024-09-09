@@ -21,7 +21,6 @@ interface EmployeeQuery extends FilterQuery<IEmployee> {
     is_active?: {
         $in: Array<Boolean>;
     };
-    is_subadmin?: boolean;
     added_by?: {
         $in: Array<AddedBy>;
     };
@@ -146,7 +145,7 @@ router.get('/get-all-employees', [verifyJWT, view(menus.Employees)], asyncHandle
         is_active: req.query.is_active && JSON.parse(String(reqQuery.is_active))
     }
     const user = req.user;
-    
+
     if (!user) throw new CustomError("Permission denied", 403);
 
     //Validating requested data
@@ -167,7 +166,6 @@ router.get('/get-all-employees', [verifyJWT, view(menus.Employees)], asyncHandle
         });
         where.is_active = { $in: active_status }
     }
-    reqQuery.is_subadmin && (where.is_subadmin = regExp.test(String(reqQuery.is_subadmin)));
     reqQuery.search && (where.$or = [
         { first_name: { $regex: String(reqQuery.search), $options: 'i' } },
         { last_name: { $regex: String(reqQuery.search), $options: 'i' } },
@@ -202,7 +200,7 @@ router.get('/get-all-employees', [verifyJWT, view(menus.Employees)], asyncHandle
         .populate({ path: 'city', select: 'name', options: { strictPopulate: false } })
         .populate({ path: 'role', select: 'name', options: { strictPopulate: false } })
         .populate({ path: 'ground', select: 'name', options: { strictPopulate: false }, populate: { path: 'venue', select: 'name', options: { strictPopulate: false } } }))
-        .map((emp) => {            
+        .map((emp) => {
             return {
                 id: emp._id,
                 first_name: emp.first_name,
@@ -246,7 +244,7 @@ router.post('/update-emp', [verifyJWT, update(menus.Employees)], asyncHandler(as
         first_name: reqData?.first_name,
         last_name: reqData?.last_name,
         mobile: reqData?.mobile,
-        gender: reqData?.gender,        
+        gender: reqData?.gender,
         is_active: reqData?.is_active,
         venue: reqData?.venue,
         ground: reqData?.ground,
@@ -307,7 +305,7 @@ router.post('/resend-mail', [verifyJWT, add(menus.Employees)], asyncHandler(asyn
     return res.status(response[0]).json(response[1]);
 }));
 
-router.get('/employee', asyncHandler(async (req: Request, res: Response)=>{
+router.get('/employee', asyncHandler(async (req: Request, res: Response) => {
     const reqQuery = req.query;
 
     const validation = validateObjectData(employee_schema, reqQuery);

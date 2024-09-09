@@ -150,8 +150,8 @@ router.get('/verify-session', verifyJWT, asyncHandler(async (req: CustomRequest,
     else if ('partner' in employee && employee.partner) {
         payload.partner = true;
         delete payload.added_by;
-        const subadminMenu = allMenus.filter(menu => partnerMenuArr.includes(menu));
-        subadminMenu.forEach(menu => {
+        const partnerMenu = allMenus.filter(menu => partnerMenuArr.includes(menu));
+        partnerMenu.forEach(menu => {
             payload.menu.push({
                 name: menu,
                 add: true,

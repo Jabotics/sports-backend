@@ -2,11 +2,12 @@ import { CustomRequest } from "../server";
 import { FilterQuery, Types } from "mongoose";
 import { IGroundReview } from "../types/types";
 import CustomError from "../errors/customError";
-import { Ground, GroundReview } from "../schemas/schema";
 import asyncHandler from "../errors/asyncHandler";
 import { response200 } from "../lib/helpers/utils";
 import { Request, Response, Router } from "express";
 import verifyJWT from "../middlewares/authentication";
+import { Ground, GroundReview } from "../schemas/schema";
+import { menus, remove, view } from "../middlewares/permission";
 import { validateArrayData, validateObjectData } from "../lib/helpers/validation";
 import { add_review_validation, get_reviews_validation, remove_review_schema, review_validation, update_review_validation } from "../validation/groundReviewValidation";
 
@@ -22,13 +23,12 @@ interface ReviewQuery extends FilterQuery<IGroundReview> {
 }
 
 function hideNumber(mobile: string) {
-    return mobile.slice(-4).padStart(mobile.length, '*');        
+    return mobile.slice(-4).padStart(mobile.length, '*');
 }
 
 router.post('/add-ground-review', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqData = req.body;
     const user = req.user;
-    console.log(user);
 
     if (!user) throw new CustomError("Session expired, please login again", 401);
 
@@ -46,7 +46,7 @@ router.post('/add-ground-review', verifyJWT, asyncHandler(async (req: CustomRequ
     return res.status(response[0]).json(response[1]);
 }));
 
-router.get('/get-ground-reviews', asyncHandler(async (req: Request, res: Response) => {
+router.get('/get-ground-reviews', [verifyJWT, view(menus.Ground_Review)], asyncHandler(async (req: Request, res: Response) => {
     const reqQuery = req.query;
 
     const validation = validateObjectData(get_reviews_validation, reqQuery);
@@ -83,7 +83,7 @@ router.get('/get-ground-reviews', asyncHandler(async (req: Request, res: Respons
                 review: review.review,
                 rating: review.rating,
                 ground: review.ground,
-                customer: review.customer,                
+                customer: review.customer,
             }
         });
 
@@ -93,11 +93,18 @@ router.get('/get-ground-reviews', asyncHandler(async (req: Request, res: Respons
     return res.status(response[0]).json(response[1]);
 }));
 
-router.post('/update-ground-review', asyncHandler(async (req: Request, res: Response) => {
+router.post('/update-ground-review', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqData = req.body;
+    const user = req.user;
+
+    if (!user) throw new CustomError("Session expired, please login again", 401);
 
     const validation = validateObjectData(update_review_validation, reqData);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
+
+    const review = await GroundReview.findOne({ _id: reqData.id, soft_delete: false });
+    if (!review) throw new CustomError("No reviews found", 404);
+    if (String(review.customer) != String(user.id)) throw new CustomError("Can't edit this comment", 403);
 
     const data = {
         review: reqData?.review,
@@ -110,7 +117,7 @@ router.post('/update-ground-review', asyncHandler(async (req: Request, res: Resp
     return res.status(response[0]).json(response[1]);
 }));
 
-router.post('/remove-ground-review', asyncHandler(async (req: Request, res: Response) => {
+router.post('/remove-ground-review', [verifyJWT, remove(menus.Ground_Review)], asyncHandler(async (req: Request, res: Response) => {
     const reqIds = req.body.reviewIds;
 
     const validation = validateArrayData(remove_review_schema, reqIds);
@@ -148,7 +155,7 @@ router.get('/ground-reviews', asyncHandler(async (req: Request, res: Response) =
             let customer = {
                 name: review.customer && 'first_name' in review.customer && 'last_name' in review.customer && `${review.customer.first_name} ${review.customer.last_name}`,
                 mobile: review.customer && 'mobile' in review.customer && hideNumber((String(review.customer.mobile)))
-            }            
+            }
             return {
                 id: review._id,
                 review: review.review,

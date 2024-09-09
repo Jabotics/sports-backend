@@ -57,7 +57,7 @@ router.post('/add-venue', [verifyJWT, add(menus.Venues)], asyncHandler(async (re
     if (findExisting.length != 0) throw new CustomError("Venue already exists", 409);
 
     //Preparing data for saving to the database
-    const data = {        
+    const data = {
         city: reqData.city,
         address: reqData.address,
         geo_location: reqData.geo_location,
@@ -129,7 +129,7 @@ router.get('/get-venues', [verifyJWT, view(menus.Venues)], asyncHandler(async (r
                 address: venue.address,
                 geo_location: venue.geo_location,
                 image: venue.image,
-                video: venue.video,                
+                video: venue.video,
                 supported_sports: venue.supported_sports,
                 is_active: venue.is_active,
             }
@@ -164,7 +164,7 @@ router.post('/update-venue', [verifyJWT, update(menus.Venues)], asyncHandler(asy
     }
 
     const data: venue_data = {
-        name: reqData?.name,        
+        name: reqData?.name,
         city: reqData?.city,
         address: reqData?.address,
         is_active: reqData?.is_active,
@@ -283,4 +283,5 @@ router.get('/venues', asyncHandler(async (req: Request, res: Response) => {
     const response = response200("", venues);
     return res.status(response[0]).json(response[1]);
 }));
+
 export default router;

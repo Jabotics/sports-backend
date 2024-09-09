@@ -9,7 +9,7 @@ const menus = {
     Menus: 'MENUS',
     Roles: 'ROLES',
     Cities: 'CITIES',
-    Admins: 'ADMINS',    
+    Admins: 'ADMINS',
     Venues: 'VENUES',
     EVENTS: 'EVENTS',
     Sports: 'SPORTS',
@@ -33,7 +33,8 @@ const menus = {
     EVENT_REQUEST: 'EVENT_REQUEST',
     Slot_Bookings: 'SLOT_BOOKINGS',
     Happy_Customers: 'HAPPY_CUSTOMERS',
-    Partner_Request: 'PARTNER_REQUEST'
+    Partner_Request: 'PARTNER_REQUEST',
+    Ground_Review: 'GROUND_REVIEW'
 }
 
 const add = (menu_name: string) => {
@@ -55,7 +56,7 @@ const add = (menu_name: string) => {
                     select: 'name'
                 });
                 let permission = roles?.permissions.find((permission: any) => permission.menu.name == menu_name);
-                
+
                 const response = response403("Permission denied");
                 if (user && (user.is_superadmin || user.is_admin)) {
                     next();
@@ -64,7 +65,7 @@ const add = (menu_name: string) => {
                 else if (user
                     && user.partner && (menu_name == menus.Grounds
                         || menu_name == menus.Employees
-                        || menu_name == menus.Roles            
+                        || menu_name == menus.Roles
                         || menu_name == menus.Slot_Times
                         || menu_name == menus.Slot_Bookings
                         || menu_name == menus.Expenses
@@ -92,7 +93,7 @@ const add = (menu_name: string) => {
 const view = (menu_name: string) => {
     return async function (req: CustomRequest, res: Response, next: NextFunction) {
         const user = req.user;
-        const type = req.headers.type;        
+        const type = req.headers.type;
 
         if (!user) {
             const response = response403("User not authenticated");
@@ -107,7 +108,7 @@ const view = (menu_name: string) => {
                     path: 'permissions.menu',
                     select: 'name'
                 });
-                let permission = roles?.permissions.find((permission: any) => permission.menu.name == menu_name);                
+                let permission = roles?.permissions.find((permission: any) => permission.menu.name == menu_name);
 
                 const response = response403("Permission denied");
                 if (user && (user.is_superadmin || user.is_admin)) {

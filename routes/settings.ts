@@ -42,7 +42,7 @@ router.post('/emp-profile-update', verifyJWT, asyncHandler(async (req: CustomReq
     }
 
     if (reqData.mobile) {
-        const emp_mobile = user && ('is_superadmin' in user || 'is_admin' in user || 'is_subadmin' in user) ? await Admin.find({ mobile: reqData.mobile }) : await Employee.find({ mobile: reqData.mobile });
+        const emp_mobile = user && ('is_superadmin' in user || 'is_admin' in user || 'partner' in user) ? await Admin.find({ mobile: reqData.mobile }) : await Employee.find({ mobile: reqData.mobile });
         if (emp_mobile.length != 0 && user && emp_mobile[0]._id != user.id) {
             throw new CustomError("Mobile already in use by another employee", 406);
         }
@@ -78,7 +78,7 @@ router.post('/emp-profile-update', verifyJWT, asyncHandler(async (req: CustomReq
 
     if (data.profile_image === "") delete data.profile_image;
 
-    user && ('is_superadmin' in user || 'is_admin' in user || 'is_subadmin' in user) ? await Admin.findByIdAndUpdate(
+    user && ('is_superadmin' in user || 'is_admin' in user || 'partner' in user) ? await Admin.findByIdAndUpdate(
         { _id: reqData.id },
         { $set: data }
     ) : await Employee.findByIdAndUpdate(
@@ -89,7 +89,7 @@ router.post('/emp-profile-update', verifyJWT, asyncHandler(async (req: CustomReq
     if (io && user) {
         let payload = {
             id: user.id,
-            type: ('is_superadmin' in user || 'is_admin' in user || 'is_subadmin' in user) ? "admin" : "regular"
+            type: ('is_superadmin' in user || 'is_admin' in user || 'partner' in user) ? "admin" : "regular"
         }
         const userData = await getUserData(payload.id, payload.type);
         io.emit("user_data", userData);
@@ -192,7 +192,7 @@ router.post('/change-password', verifyJWT, asyncHandler(async (req: CustomReques
 
     if (user && user.id !== reqData.id) throw new CustomError('Permission denied', 403);
 
-    const employee = user && ('is_superadmin' in user || 'is_admin' in user || 'is_subadmin' in user)
+    const employee = user && ('is_superadmin' in user || 'is_admin' in user || 'partner' in user)
         ? await Admin.findById({ _id: reqData.id })
         : await Employee.findById({ _id: reqData.id });
 
@@ -205,7 +205,7 @@ router.post('/change-password', verifyJWT, asyncHandler(async (req: CustomReques
 
     const hashedPassword = await bcrypt.hash(reqData.new_password, 10);
 
-    user && ('is_superadmin' in user || 'is_admin' in user || 'is_subadmin' in user)
+    user && ('is_superadmin' in user || 'is_admin' in user || 'partner' in user)
         ? await Admin.findByIdAndUpdate(
             { _id: reqData.id },
             { $set: { password: hashedPassword } }
