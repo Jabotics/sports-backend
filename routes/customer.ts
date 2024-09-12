@@ -124,7 +124,7 @@ router.post('/validate-otp', asyncHandler(async (req: Request, res: Response) =>
             first_name: customer.first_name,
             last_name: customer.last_name,
             email: customer?.email,
-            mobile: customer.mobile,      
+            mobile: customer.mobile,
             joined_academies: customer.joined_academies,
             joined_memberships: customer.joined_memberships,
             favorites: customer.favorites,
@@ -187,14 +187,14 @@ router.get('/get-all-customers', [verifyJWT, view(menus.Customers)], asyncHandle
     return res.status(response[0]).json(response[1]);
 }));
 
-router.post('/favorites', verifyJWT ,asyncHandler(async (req: CustomRequest, res: Response) => {
+router.post('/favorites', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqData = req.body;
     const user = req.user;
 
-    if(!user) throw new CustomError("Session expired, please login again", 403);
+    if (!user) throw new CustomError("Session expired, please login again", 403);
 
     const validation = validateObjectData(add_to_favorites_schema, reqData);
-    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);    
+    if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
 
     const ground = await Ground.findOne({ _id: reqData.ground_id, is_active: true, soft_delete: false });
     if (!ground) throw new CustomError("Ground does not exist or disabled", 406);
@@ -221,12 +221,12 @@ router.post('/favorites', verifyJWT ,asyncHandler(async (req: CustomRequest, res
     return res.status(response[0]).json(response[1]);
 }));
 
-router.post('/update-user-profile', verifyJWT ,asyncHandler(async (req: CustomRequest, res: Response)=>{
+router.post('/update-user-profile', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
     const reqData = req.body;
     const user = req.user;
     const reqImages = req.files;
-    
-    if(!user) throw new CustomError("Permission denied", 403);
+
+    if (!user) throw new CustomError("Permission denied", 403);
 
     const validation = validateObjectData(update_user_profile, reqData);
     if (validation.error) throw new CustomError(validation.error.message, 406, validation.error.details[0].context?.key);
@@ -236,10 +236,10 @@ router.post('/update-user-profile', verifyJWT ,asyncHandler(async (req: CustomRe
         if (imgValidation.error) throw new CustomError(imgValidation.error.message, 406, imgValidation.error.details[0].context?.key);
     }
 
-    const customer = await Customer.findOne({_id: user.id, soft_delete: false});
-    if(!customer) throw new CustomError("User not found, please login again", 404);
+    const customer = await Customer.findOne({ _id: user.id, soft_delete: false });
+    if (!customer) throw new CustomError("User not found, please login again", 404);
     var regExp = new RegExp("true");
-    if(!regExp.test(String(customer.is_active))) throw new CustomError("Your account is disabled, please contact admin", 406);
+    if (!regExp.test(String(customer.is_active))) throw new CustomError("Your account is disabled, please contact admin", 406);
 
     const data = {
         first_name: reqData?.first_name,
@@ -251,29 +251,29 @@ router.post('/update-user-profile', verifyJWT ,asyncHandler(async (req: CustomRe
 
     if (Array.isArray(reqImages) && reqImages.length != 0) {
         await removeFile(uploadPaths.customers, reqData.id)
-        for (let i in reqImages) {            
+        for (let i in reqImages) {
             await saveImage(uploadPaths.customers, `${user.id}-${reqImages[i].originalname}`, reqImages[i].buffer);
-        }        
+        }
         let url = await findFile(user.id, uploadPaths.customers);
-        let profile_img = url.find((img)=> img.includes("profile"));        
+        let profile_img = url.find((img) => img.includes("profile"));
         data.profile_img = profile_img;
     }
 
     await Customer.findByIdAndUpdate(user.id, data);
 
-    const response = response200("Profile updated", {id: user.id});
+    const response = response200("Profile updated", { id: user.id });
     return res.status(response[0]).json(response[1]);
 }));
 
-router.get('/verify-user-session', verifyJWT ,asyncHandler(async (req: CustomRequest, res: Response)=>{
+router.get('/verify-user-session', verifyJWT, asyncHandler(async (req: CustomRequest, res: Response) => {
     const user = req.user;
 
-    if(!user) throw new CustomError("Session expired, please login again", 403);
+    if (!user) throw new CustomError("Session expired, please login again", 403);
 
     const customer = await Customer.findById(user.id);
-    if(!customer) throw new CustomError("Session expired, please login again", 403);
-    if(!customer.is_active) throw new CustomError("Your account is de-activated, please contact admin", 403);
-    if(customer.soft_delete) throw new CustomError("User not found", 404);
+    if (!customer) throw new CustomError("Session expired, please login again", 403);
+    if (!customer.is_active) throw new CustomError("Your account is de-activated, please contact admin", 403);
+    if (customer.soft_delete) throw new CustomError("User not found", 404);
 
     const payload = {
         id: customer._id,
@@ -291,7 +291,7 @@ router.get('/verify-user-session', verifyJWT ,asyncHandler(async (req: CustomReq
     return res.status(response[0]).json(response[1]);
 }));
 
-router.get('/customer', asyncHandler(async (req: Request, res: Response)=>{
+router.get('/customer', asyncHandler(async (req: Request, res: Response) => {
     const reqQuery = req.query;
 
     const validation = validateObjectData(customer_schema, reqQuery);
