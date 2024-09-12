@@ -39,7 +39,8 @@ router.post('/add-ground-review', verifyJWT, asyncHandler(async (req: CustomRequ
         customer: user.id,
         ground: reqData.ground,
         review: reqData.review,
-        rating: reqData.rating
+        rating: reqData.rating,
+        is_active: true,
     });
 
     const response = response200("Review submitted successfully", {});
@@ -78,12 +79,14 @@ router.get('/get-ground-reviews', [verifyJWT, view(menus.Ground_Review)], asyncH
         .skip(Number(reqQuery.offset) || 0)
     )
         .map(review => {
+            console.log(review)
             return {
                 id: review._id,
                 review: review.review,
                 rating: review.rating,
                 ground: review.ground,
                 customer: review.customer,
+                is_active: review.is_active,
             }
         });
 
@@ -105,10 +108,16 @@ router.post('/update-ground-review', verifyJWT, asyncHandler(async (req: CustomR
     const review = await GroundReview.findOne({ _id: reqData.id, soft_delete: false });
     if (!review) throw new CustomError("No reviews found", 404);
     if (String(review.customer) != String(user.id)) throw new CustomError("Can't edit this comment", 403);
+    // CHECK THIS PART: Also ALlow for super-admins
 
-    const data = {
+    const data: {
+        review: string;
+        rating: string;
+        is_active: boolean
+    } = {
         review: reqData?.review,
-        rating: reqData?.rating
+        rating: reqData?.rating,
+        is_active: reqData?.is_active,
     }
 
     await GroundReview.findByIdAndUpdate(reqData.id, data);
