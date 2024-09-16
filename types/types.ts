@@ -537,7 +537,8 @@ interface IGroundReview extends Document {
     customer: Types.ObjectId;
     ground: Types.ObjectId;
     review: string;
-    rating: number;    
+    rating: number;  
+    is_active: boolean;  
     soft_delete: boolean;
 }
 

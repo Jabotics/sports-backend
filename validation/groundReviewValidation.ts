@@ -19,7 +19,8 @@ const review_validation = Joi.object({
 const update_review_validation = Joi.object({
     id: Joi.string().required(),
     review: Joi.string().min(2),
-    rating: Joi.number().positive().max(1).valid(0,1,2,3,4,5)
+    rating: Joi.number().positive().max(1).valid(0,1,2,3,4,5),
+    is_active: Joi.boolean(),
 });
 
 const remove_review_schema = Joi.array().items(Joi.string().required()).required()

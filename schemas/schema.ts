@@ -1568,6 +1568,10 @@ const groundReviewSchema = new Schema<IGroundReview>({
         type: Number,
         required: true
     },
+    is_active: {
+        type: Boolean,
+        required: true,
+    },
     soft_delete: {
         type: Boolean,
         default: false
